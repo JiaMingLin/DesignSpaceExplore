@@ -130,7 +130,14 @@ def tiling_candidates(R, C, N, M, tiling_factor=4):
     else:
         ls_Tm += tiling_factor
         
-    a = [list(ls_Tr),list(ls_Tc),list(ls_Tn), list(ls_Tm)]
+    a = [\
+        [int(x) for x in ls_Tr],\
+        [int(x) for x in ls_Tc],\
+        [int(x) for x in ls_Tn],\
+        [int(x) for x in ls_Tm]
+    ]
+
+
     return list(itertools.product(*a))
 
 def RF_Model(layer_meta, board, \
@@ -166,7 +173,7 @@ def RF_Model(layer_meta, board, \
         if ctc > 0:
             if ctc < comp_bnd/float(bw_bnd):
                 attainable = min(attainable, ctc*bw_bnd)
-            pair.append((ctc, attainable))
+            pair.append((float(ctc), float(attainable)))
             params.append((Tr, Tc, Tn, Tm))
     return pair, params, comp_bnd, bw_bnd
 

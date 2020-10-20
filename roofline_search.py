@@ -3,14 +3,17 @@ from workloads.common import *
 
 from roofline.roofline_model import *
 
-net = vgg16.network(resolutions['original'])
-save_path = 'files/vgg16'
+# net = vgg16.network(resolutions['original'])
+# save_path = 'files/vgg16'
+
+net = simple_net.network(resolutions['original'])
+save_path = 'files/simple_net'
 
 board_part = 'zcu102'
 double_buff=False
 num_hp = 1
 t_factor = 2
-bits = 32
+bits = 8
 buswidth = 128
 
 sol_ls = []
