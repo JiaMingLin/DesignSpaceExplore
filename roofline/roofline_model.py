@@ -223,8 +223,8 @@ def plot_roofline(pair_ls, comp_bnd, bw_bnd, solution, save_fig_name):
     plt.annotate(sol_txt, solution[0])
 
     plt.title('Roof Line Model')
-    plt.xlabel('CTC Ratio')
-    plt.ylabel('Attainable Performance')
+    plt.xlabel('CTC Ratio(FLOP/Byte)')
+    plt.ylabel('Attainable Performance(GFLOP/S)')
 
     plt.grid()
     plt.savefig(save_fig_name)

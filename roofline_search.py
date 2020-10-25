@@ -16,10 +16,11 @@ board_part = 'zcu102'
 double_buff=False
 num_hp = 1
 t_factor = 2
-bits = 8
+bits = 9
 buswidth = 128
 
 sol_ls = []
+cost_ls = []
 layer_cycles = []
 for layer_idx in net.keys():
     print("cuttent layer: ", layer_idx)
@@ -40,6 +41,14 @@ avg_Tc = list(zip(*sol_ls))[1]; avg_Tc = statistics.mean(avg_Tc)
 avg_Tn = list(zip(*sol_ls))[2]; avg_Tn = statistics.mean(avg_Tn)
 avg_Tm = list(zip(*sol_ls))[3]; avg_Tm = statistics.mean(avg_Tm)
 
+MAX_K=7; MAX_S = 2
+beta_in = avg_Tn * (MAX_S*avg_Tr + MAX_K-MAX_S) * (MAX_S*avg_Tc + MAX_K-MAX_S)
+beta_wgt = avg_Tn * avg_Tm * MAX_K * MAX_K
+beta_out = avg_Tm * avg_Tr * avg_Tc
+
+bram_cost = bram_usage(beta_in, beta_wgt, beta_out, avg_Tn, avg_Tm, bits = bits, double_buff=double_buff)
+dsp_cost = dsp_usage(avg_Tn, avg_Tm, bits)
+
 all_layer_cycle = 0
 for layer_idx in net.keys():
     layer_meta = net[layer_idx]
@@ -48,8 +57,10 @@ for layer_idx in net.keys():
     S = 1
     all_layer_cycle += exec_cycles(R, C, N, M, avg_Tr, avg_Tc, avg_Tn, avg_Tm, S, K)
 
-print(sol_ls)
+# print(sol_ls)
 print("averaged Tr = {}, Tc = {}, Tn = {}, Tm = {}".format(avg_Tr, avg_Tc, avg_Tn, avg_Tm))
 print("sum of each layer exec_cycles: ", sum(layer_cycles))
 print("sum of uniformed layer exec_cycles: ", all_layer_cycle)
-print("latency(ms): ", (all_layer_cycle/(200*(10**6)))*(10**3))
+print("average latency(ms): ", (all_layer_cycle/(200*(10**6)))*(10**3))
+print("optimal latency(ms): ", (sum(layer_cycles)/(200*(10**6)))*(10**3))
+print("resuorce cost, BRAM = {}, DSP = {}".format(bram_cost, dsp_cost))

@@ -2,7 +2,7 @@ def network(res, num_class = 101):
     nix = res["nix"]
     niy = res["niy"]
     network_template = {
-        "conv1": {"nix": nix, "niy": niy, "nif": 3, "nof": 64, "stride":2, "kernel": 7, "type": "conv"}
+        "conv1": {"nix": nix, "niy": niy, "nif": 3, "nof": 64, "stride":2, "kernel": 7, "type": "conv"},
         ############################# block 1 #############################
         "conv1_1": {"nix": nix/2, "niy": niy/2, "nif": 64, "nof": 64, "kernel": 1, "type": "pw_conv"}, #0
         "conv1_2": {"nix": nix/2, "niy": niy/2, "nif": 64, "nof": 64, "kernel": 3,  "type": "conv"},#1
