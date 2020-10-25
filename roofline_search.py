@@ -1,10 +1,13 @@
-from workloads import vgg16, simple_net
+from workloads import vgg16, simple_net, resnet50
 from workloads.common import *
 
 from roofline.roofline_model import *
 
 net = vgg16.network(resolutions['original'])
 save_path = 'files/vgg16'
+
+net = resnet50.network(resolutions['original'])
+save_path = 'files/resnet50'
 
 # net = simple_net.network(resolutions['original'])
 # save_path = 'files/simple_net'
