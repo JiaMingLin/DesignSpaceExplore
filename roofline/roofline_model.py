@@ -61,16 +61,18 @@ def ctc_ratio(R, C, N, M, Tr, Tc, Tn, Tm, S, K, BRAM, DSP, bits = 8, double_buff
     alpha_wgt = ceil(M/Tm) * ceil(N/Tn) * ceil(R/Tr) * ceil(C/Tc)
     alpha_out = ceil(M/Tm) * ceil(R/Tr) * ceil(C/Tc)
     
-    if bram_usage(beta_in, beta_wgt, beta_out, Tn, Tm, bits, double_buff) > BRAM:
-        return -1
+    bram_cost = bram_usage(beta_in, beta_wgt, beta_out, Tn, Tm, bits, double_buff)
+    dsp_cost = dsp_usage(Tn, Tm, bits)
+
+    if bram_cost > BRAM:
+        return -1, bram_cost, dsp_cost
     
-    if dsp_usage(Tn, Tm, bits) > DSP:
-        return -1
+    if dsp_cost > DSP:
+        return -1, bram_cost, dsp_cost
     
     num_ops = 2 * R * C * M * N * K * K
     num_ext_access = alpha_in * beta_in + alpha_wgt * beta_wgt + alpha_out * beta_out
-    
-    return num_ops/float(num_ext_access)
+    return num_ops/float(num_ext_access), bram_cost, dsp_cost
 
 def exec_cycles(R, C, N, M, Tr, Tc, Tn, Tm, S, K, double_buff = False):
 
@@ -147,7 +149,7 @@ def RF_Model(layer_meta, board, \
     N = layer_meta['nif']
     M = layer_meta['nof']
     K = layer_meta['kernel']
-    S = 1
+    S = layer_meta['stride'] if 'stride' in layer_meta.keys() else 1 
     BRAM = board['bram']
     num_dsp = board['dsp']
     freq = board['freq']
@@ -163,11 +165,12 @@ def RF_Model(layer_meta, board, \
     
     pair = []
     params = []
+    costs = []
     for i in trange(len(tiling_params)):
         (Tr, Tc, Tn, Tm) = tiling_params[i]
         if Tm < Tn:
             continue
-        ctc = ctc_ratio(R, C, N, M, Tr, Tc, Tn, Tm, S, K, BRAM, num_dsp, bits, double_buff)
+        ctc, bram_cost, dsp_cost = ctc_ratio(R, C, N, M, Tr, Tc, Tn, Tm, S, K, BRAM, num_dsp, bits, double_buff)
         attainable = compute_roof(R, C, N, M, Tr, Tc, Tn, Tm, S, K, num_dsp, freq, bits, double_buff)
         
         if ctc > 0:
@@ -175,20 +178,21 @@ def RF_Model(layer_meta, board, \
                 attainable = min(attainable, ctc*bw_bnd)
             pair.append((float(ctc), float(attainable)))
             params.append((Tr, Tc, Tn, Tm))
-    return pair, params, comp_bnd, bw_bnd
+            costs.append((bram_cost, dsp_cost))
+    return pair, params, costs, comp_bnd, bw_bnd
 
 def DSE_layer(layer_meta, board_part, layer_idx, bits, buswidth, t_factor,  save_path,\
     double_buff=False, num_hp = 1):
     
     fpga = fpga_boards[board_part]
 
-    pair_ls, params, comp_bnd, bw_bnd = RF_Model(\
+    (pair_ls, params, costs, comp_bnd, bw_bnd) = RF_Model(\
         layer_meta, fpga, \
         tiling_factor = t_factor, bits=bits, l_type = layer_meta['type'], \
         buswidth = buswidth, double_buff= double_buff, num_hp = num_hp)
     # pair_ls = (ctc, attainable)
     max_throughput_value = max(pair_ls, key = lambda it: it[1])[1]
-    max_throughput_ls = list(filter(lambda it: it[0][1]==max_throughput_value, list(zip(pair_ls, params))))
+    max_throughput_ls = list(filter(lambda it: it[0][1]==max_throughput_value, list(zip(pair_ls, params, costs))))
     solution = max(max_throughput_ls, key = lambda it: it[0][0])
     save_fig_name = save_path+'/{}_{}_tf_{}_bits_{}_bus_{}.png'.format(board_part, layer_idx, t_factor, bits, buswidth)
        
