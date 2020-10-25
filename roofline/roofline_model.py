@@ -224,3 +224,4 @@ def plot_roofline(pair_ls, comp_bnd, bw_bnd, solution, save_fig_name):
 
     plt.grid()
     plt.savefig(save_fig_name)
+    plt.close()

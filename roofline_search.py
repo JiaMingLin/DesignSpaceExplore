@@ -3,11 +3,11 @@ from workloads.common import *
 
 from roofline.roofline_model import *
 
-# net = vgg16.network(resolutions['original'])
-# save_path = 'files/vgg16'
+net = vgg16.network(resolutions['original'])
+save_path = 'files/vgg16'
 
-net = simple_net.network(resolutions['original'])
-save_path = 'files/simple_net'
+# net = simple_net.network(resolutions['original'])
+# save_path = 'files/simple_net'
 
 board_part = 'zcu102'
 double_buff=False
@@ -45,6 +45,8 @@ for layer_idx in net.keys():
     S = 1
     all_layer_cycle += exec_cycles(R, C, N, M, avg_Tr, avg_Tc, avg_Tn, avg_Tm, S, K)
 
+print(sol_ls)
+print("averaged Tr = {}, Tc = {}, Tn = {}, Tm = {}".format(avg_Tr, avg_Tc, avg_Tn, avg_Tm))
 print("sum of each layer exec_cycles: ", sum(layer_cycles))
 print("sum of uniformed layer exec_cycles: ", all_layer_cycle)
-print("latency(ms): ", all_layer_cycle/(200*(10**6)))
+print("latency(ms): ", (all_layer_cycle/(200*(10**6)))*(10**3))
