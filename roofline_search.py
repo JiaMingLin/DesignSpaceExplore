@@ -3,8 +3,8 @@ from workloads.common import *
 
 from roofline.roofline_model import *
 
-net = vgg16.network(resolutions['original'])
-save_path = 'files/vgg16'
+# net = vgg16.network(resolutions['original'])
+# save_path = 'files/vgg16'
 
 net = resnet50.network(resolutions['original'])
 save_path = 'files/resnet50'
