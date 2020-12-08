@@ -6,17 +6,17 @@ from roofline.roofline_model import *
 # net = vgg16.network(resolutions['original'])
 # save_path = 'files/vgg16'
 
-net = resnet50.network(resolutions['original'])
-save_path = 'files/resnet50'
+# net = resnet50.network(resolutions['original'])
+# save_path = 'files/resnet50'
 
-# net = simple_net.network(resolutions['original'])
-# save_path = 'files/simple_net'
+net = simple_net.network(resolutions['original'])
+save_path = 'files/simple_net'
 
 board_part = 'zcu102'
-double_buff=False
+double_buff=True
 num_hp = 1
 t_factor = 2
-bits = 9
+bits = 8
 buswidth = 128
 
 sol_ls = []

@@ -106,7 +106,10 @@ def compute_roof(R, C, N, M, Tr, Tc, Tn, Tm, S, K, num_dsp, freq, bits=8, double
     
     bound = compute_bound(num_dsp, freq, bits)
     
-    return min((num_ops*freq)/float(num_exec_cycles), bound)
+    secs = num_exec_cycles/(freq * 10**9)
+    # return min((num_ops*freq)/float(num_exec_cycles), bound)
+    # print("num_exec_cycles = {}, secs = {}, num_ops = {}".format(num_exec_cycles, secs, num_ops))
+    return (num_ops*freq)/float(num_exec_cycles)
 
 # tiling size increased by tiling_factor
 def tiling_candidates(R, C, N, M, tiling_factor=4):
@@ -138,7 +141,6 @@ def tiling_candidates(R, C, N, M, tiling_factor=4):
         [int(x) for x in ls_Tn],\
         [int(x) for x in ls_Tm]
     ]
-
 
     return list(itertools.product(*a))
 
