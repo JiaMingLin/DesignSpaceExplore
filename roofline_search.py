@@ -31,7 +31,7 @@ for layer_idx in net.keys():
 
     sol_ls.append(solution[1])
     R = layer_meta['niy']; C = layer_meta['nix']; N = layer_meta['nif']; M = layer_meta['nof']; K = layer_meta['kernel']
-    S = 1
+    S = layer_meta['stride'] if 'stride' in layer_meta.keys() else 1
     Tr = solution[1][0];Tc = solution[1][1];Tn = solution[1][2];Tm = solution[1][3]
     layer_cycles.append(exec_cycles(R, C, N, M, Tr, Tc, Tn, Tm, S, K))
 

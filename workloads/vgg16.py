@@ -1,3 +1,4 @@
+from .common import ops
 def network(res, num_class = 1000):
     nix = res["nix"]
     niy = res["niy"]
@@ -15,8 +16,11 @@ def network(res, num_class = 1000):
         "conv5_1": {"nix": nix/16, "niy": niy/16, "nif": 512, "nof": 512, "kernel": 3, "type": "conv"}, #10
         "conv5_2": {"nix": nix/16, "niy": niy/16, "nif": 512, "nof": 512, "kernel": 3, "type": "conv"}, #11
         "conv5_3": {"nix": nix/16, "niy": niy/16, "nif": 512, "nof": 512, "kernel": 3, "type": "conv"}, #12
-        #"fc6": {"nix": nix/32, "niy": niy/32, "nif": 512, "nof": 4096, "kernel": 1, "type":"fc"}, #13
-        #"fc7": {"nix": 1, "niy": 1, "nif": 4096, "nof": 4096, "kernel": 1, "type":"fc"}, #14
-        #"fc8": {"nix": 1, "niy": 1, "nif": 4096, "nof": num_class, "kernel": 1, "type":"fc"}, #15
+        "fc6": {"nix": nix/32, "niy": niy/32, "nif": 512, "nof": 4096, "kernel": 1, "type":"fc"}, #13
+        "fc7": {"nix": 1, "niy": 1, "nif": 4096, "nof": 4096, "kernel": 1, "type":"fc"}, #14
+        "fc8": {"nix": 1, "niy": 1, "nif": 4096, "nof": num_class, "kernel": 1, "type":"fc"}, #15
     }
+    
+    operations = ops(network_template)
+    print("VGG-16 OPs = ", operations)
     return network_template
